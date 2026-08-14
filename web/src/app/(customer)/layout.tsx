@@ -27,12 +27,13 @@ export default async function CustomerLayout({
             <nav className="hidden md:flex items-center space-x-8 text-sm md:text-base font-bold uppercase tracking-wider">
               <Link href="/" className="text-foreground/80 hover:text-primary hover:border-b-2 hover:border-primary pb-1 transition-all">Beranda</Link>
               <Link href="/#layanan" className="text-foreground/80 hover:text-primary hover:border-b-2 hover:border-primary pb-1 transition-all">Layanan</Link>
-              <Link href="/booking" className="text-foreground/80 hover:text-primary hover:border-b-2 hover:border-primary pb-1 transition-all">Booking</Link>
               
               {session && (
                 <>
+                  <Link href="/booking" className="text-foreground/80 hover:text-primary hover:border-b-2 hover:border-primary pb-1 transition-all">Booking</Link>
                   <Link href="/kendaraan" className="text-foreground/80 hover:text-primary hover:border-b-2 hover:border-primary pb-1 transition-all">Kendaraan</Link>
                   <Link href="/riwayat" className="text-foreground/80 hover:text-primary hover:border-b-2 hover:border-primary pb-1 transition-all">Riwayat</Link>
+                  <Link href="/profil" className="text-foreground/80 hover:text-primary hover:border-b-2 hover:border-primary pb-1 transition-all">Profil</Link>
                 </>
               )}
             </nav>
@@ -62,6 +63,14 @@ export default async function CustomerLayout({
           </div>
         </div>
       </header>
+
+      {/* Running Text (Marquee) */}
+      <div className="bg-primary text-primary-foreground overflow-hidden whitespace-nowrap py-2 border-b-2 border-foreground">
+        <div className="inline-block animate-[marquee_20s_linear_infinite] text-sm font-black uppercase tracking-widest">
+          SELAMAT DATANG DI SATRA GARAGE+ | PUSAT PERAWATAN OTOMOTIF PREMIUM | SPESIALIS TUNE UP & SERVIS BERAT | PROMO GANTI OLI DISKON 10% | BUKA SETIAP HARI (KECUALI RACE DAY)
+        </div>
+      </div>
+
       <main className="flex-1 flex-col flex">{children}</main>
       <footer className="border-t-8 border-primary bg-foreground text-background pt-16 pb-8 overflow-hidden relative">
         {/* Background decorative racing stripes */}
@@ -95,7 +104,7 @@ export default async function CustomerLayout({
               <ul className="space-y-3 text-sm font-bold uppercase tracking-wider text-background/80">
                 <li><Link href="/" className="hover:text-primary transition-colors flex items-center gap-2"><span className="text-primary">/</span> Beranda</Link></li>
                 <li><Link href="/#layanan" className="hover:text-primary transition-colors flex items-center gap-2"><span className="text-primary">/</span> Layanan</Link></li>
-                <li><Link href="/booking" className="hover:text-primary transition-colors flex items-center gap-2"><span className="text-primary">/</span> Booking</Link></li>
+                {session && <li><Link href="/booking" className="hover:text-primary transition-colors flex items-center gap-2"><span className="text-primary">/</span> Booking</Link></li>}
                 <li><Link href="/register" className="hover:text-primary transition-colors flex items-center gap-2"><span className="text-primary">/</span> Daftar Member</Link></li>
               </ul>
             </div>

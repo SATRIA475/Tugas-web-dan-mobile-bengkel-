@@ -24,10 +24,10 @@ export default function MobileNav({ session }: { session: any }) {
           <nav className="flex flex-col h-full p-6 space-y-6 overflow-y-auto">
             <Link href="/" onClick={close} className="text-xl font-black uppercase italic tracking-widest border-b-2 border-primary/20 pb-2">Beranda</Link>
             <Link href="/#layanan" onClick={close} className="text-xl font-black uppercase italic tracking-widest border-b-2 border-primary/20 pb-2">Layanan</Link>
-            <Link href="/booking" onClick={close} className="text-xl font-black uppercase italic tracking-widest border-b-2 border-primary/20 pb-2">Booking</Link>
             
             {session && (
               <>
+                <Link href="/booking" onClick={close} className="text-xl font-black uppercase italic tracking-widest border-b-2 border-primary/20 pb-2">Booking</Link>
                 <Link href="/kendaraan" onClick={close} className="text-xl font-black uppercase italic tracking-widest border-b-2 border-primary/20 pb-2">Kendaraan</Link>
                 <Link href="/riwayat" onClick={close} className="text-xl font-black uppercase italic tracking-widest border-b-2 border-primary/20 pb-2">Riwayat</Link>
               </>

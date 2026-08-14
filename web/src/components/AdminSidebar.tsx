@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, Car, Wrench, Calendar, Banknote, LogOut, Menu, X } from 'lucide-react'
+import { LayoutDashboard, Users, Bike, Wrench, Calendar, Banknote, LogOut, Menu, X } from 'lucide-react'
 import { logout } from '@/app/actions/auth'
 
 export default function AdminSidebar() {
@@ -71,7 +71,7 @@ export default function AdminSidebar() {
             </li>
             <li>
               <Link href="/admin/dashboard/kendaraan" onClick={close} className={`flex items-center gap-4 border-2 border-transparent px-4 py-3 text-sm font-black uppercase tracking-widest hover:border-foreground hover:bg-foreground hover:text-background transition-all skew-x-[-5deg] ${pathname === '/admin/dashboard/kendaraan' ? 'bg-foreground text-background' : ''}`}>
-                <span className="skew-x-[5deg] flex items-center gap-4"><Car className="h-5 w-5" /> Kendaraan</span>
+                <span className="skew-x-[5deg] flex items-center gap-4"><Bike className="h-5 w-5" /> Kendaraan</span>
               </Link>
             </li>
             <li>

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, SafeAreaView, Platform, ScrollView, RefreshCont
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../utils/api';
-import { Car, Plus, Trash2 } from 'lucide-react-native';
+import { Motorbike, Plus, Trash2 } from 'lucide-react-native';
 
 export default function VehicleScreen() {
   const [vehicles, setVehicles] = useState<any[]>([]);
@@ -136,7 +136,7 @@ export default function VehicleScreen() {
           
           {vehicles.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Car color="#94A3B8" size={48} />
+              <Motorbike color="#94A3B8" size={48} />
               <Text style={styles.emptyText}>Belum ada kendaraan di garasi.</Text>
             </View>
           ) : (

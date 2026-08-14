@@ -1,6 +1,6 @@
 import { getSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'
-import { Car, Wrench } from 'lucide-react'
+import { Motorbike, Wrench } from 'lucide-react'
 
 async function getKendaraan(userId: string) {
   try {
@@ -43,7 +43,7 @@ export default async function KendaraanPage() {
               <div className="p-8 skew-x-[2deg]">
                 <div className="flex justify-between items-start mb-6 border-b-2 border-foreground pb-4">
                   <div className="bg-primary/20 p-3 rounded-none border-2 border-primary">
-                    <Car className="w-8 h-8 text-primary" />
+                    <Motorbike className="w-8 h-8 text-primary" />
                   </div>
                   <span className="bg-foreground text-background font-black italic uppercase px-3 py-1 text-sm tracking-widest">{k.tahun || 'N/A'}</span>
                 </div>

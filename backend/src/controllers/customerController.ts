@@ -35,3 +35,22 @@ export const getKendaraan = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch vehicles' });
   }
 };
+
+export const getProfile = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const [rows] = await pool.query(`
+      SELECT id, email, nama, no_telepon, role, createdAt
+      FROM users
+      WHERE id = ?
+    `, [userId]);
+    
+    if (Array.isArray(rows) && rows.length > 0) {
+      res.json((rows as RowDataPacket[])[0]);
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch profile' });
+  }
+};

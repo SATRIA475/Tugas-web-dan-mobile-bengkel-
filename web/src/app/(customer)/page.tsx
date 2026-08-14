@@ -145,7 +145,43 @@ export default async function CustomerHomePage() {
           </div>
         </div>
       </section>
-      
+      {/* Developer Team Section */}
+      <section className="w-full py-32 bg-card relative border-b-4 border-foreground overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10" />
+        <div className="container mx-auto px-6 text-center relative z-10">
+          <div className="mb-16">
+            <h2 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-foreground border-b-8 border-primary pb-2 inline-block">Web <span className="text-primary">Developers</span></h2>
+            <p className="mt-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">The minds behind Satra Garage+</p>
+          </div>
+          
+          <div className="flex flex-col md:flex-row justify-center items-center gap-12 md:gap-20">
+            {/* Dev 1 */}
+            <div className="group relative flex flex-col items-center">
+              <div className="w-64 h-80 relative overflow-hidden border-4 border-foreground shadow-[8px_8px_0px_rgba(220,38,38,1)] skew-x-[-3deg] transition-transform duration-300 group-hover:-translate-y-3 group-hover:shadow-[12px_12px_0px_rgba(220,38,38,1)]">
+                <div className="absolute inset-0 bg-blue-600/20 z-10 mix-blend-multiply skew-x-[3deg]"></div>
+                <Image src="/riansa.jpg" alt="Riansa Putra" fill className="object-cover skew-x-[3deg] scale-110 group-hover:scale-105 transition-transform duration-500" />
+              </div>
+              <div className="mt-8 bg-foreground text-background px-6 py-3 skew-x-[-10deg] border-2 border-primary">
+                <h3 className="text-xl font-black uppercase italic tracking-wider skew-x-[10deg]">Riansa Putra</h3>
+              </div>
+              <p className="mt-3 text-sm font-bold uppercase text-foreground/70 tracking-widest">Backend dan SRS</p>
+            </div>
+            
+            {/* Dev 2 */}
+            <div className="group relative flex flex-col items-center">
+              <div className="w-64 h-80 relative overflow-hidden border-4 border-foreground shadow-[8px_8px_0px_rgba(220,38,38,1)] skew-x-[-3deg] transition-transform duration-300 group-hover:-translate-y-3 group-hover:shadow-[12px_12px_0px_rgba(220,38,38,1)]">
+                <div className="absolute inset-0 bg-blue-600/20 z-10 mix-blend-multiply skew-x-[3deg]"></div>
+                <Image src="/satria.jpg" alt="Satria Arief Wibowo" fill className="object-cover skew-x-[3deg] scale-110 group-hover:scale-105 transition-transform duration-500" />
+              </div>
+              <div className="mt-8 bg-foreground text-background px-6 py-3 skew-x-[-10deg] border-2 border-primary">
+                <h3 className="text-xl font-black uppercase italic tracking-wider skew-x-[10deg]">Satria Arief Wibowo</h3>
+              </div>
+              <p className="mt-3 text-sm font-bold uppercase text-foreground/70 tracking-widest">Fullstack Developer</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Official Partners Section */}
       <section className="w-full py-24 bg-background relative border-b-4 border-foreground overflow-hidden">
         <div className="container mx-auto px-6 text-center">
