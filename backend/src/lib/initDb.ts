@@ -7,12 +7,33 @@ import { RowDataPacket } from 'mysql2';
 import { pool } from './db';
 
 /**
+ * Jika DATABASE_URL menunjuk ke database yang belum ada (mis. database `bengkel`
+ * di server MySQL yang dipakai bersama aplikasi lain), buat database tersebut.
+ */
+async function buatDatabaseJikaBelumAda() {
+  const raw = process.env.DATABASE_URL;
+  if (!raw) return;
+  const url = new URL(raw);
+  const nama = decodeURIComponent(url.pathname.replace(/^\//, ''));
+  if (!nama || !/^[A-Za-z0-9_]+$/.test(nama)) return;
+  url.pathname = '/';
+  const conn = await mysql.createConnection(url.toString());
+  try {
+    await conn.query(`CREATE DATABASE IF NOT EXISTS \`${nama}\``);
+  } finally {
+    await conn.end();
+  }
+}
+
+/**
  * Siapkan database saat backend start (dipakai saat deploy, mis. Railway):
  * 1. Jika tabel `users` belum ada (database baru/kosong), jalankan sql/schema.sql.
  * 2. Jika ADMIN_EMAIL & ADMIN_PASSWORD diisi dan akun itu belum ada, buat akun admin.
  * Aman dijalankan berulang kali: database yang sudah berisi tidak diubah.
  */
 export async function initDatabase() {
+  await buatDatabaseJikaBelumAda();
+
   const [tables] = await pool.query<RowDataPacket[]>("SHOW TABLES LIKE 'users'");
   if (tables.length === 0) {
     const file = path.resolve(process.cwd(), 'sql', 'schema.sql');
