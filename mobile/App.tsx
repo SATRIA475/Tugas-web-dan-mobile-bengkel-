@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
@@ -21,13 +22,14 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
+    <SafeAreaProvider>
     <NavigationContainer>
-      <StatusBar style="light" backgroundColor="#000000" />
+      <StatusBar style="dark" />
       <Stack.Navigator
         initialRouteName="Landing"
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: '#F1F5F9' },
+          contentStyle: { backgroundColor: '#FFFFFF' },
           animation: 'slide_from_right'
         }}
       >
@@ -38,5 +40,6 @@ export default function App() {
         <Stack.Screen name="AdminApp" component={AdminTabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
+    </SafeAreaProvider>
   );
 }

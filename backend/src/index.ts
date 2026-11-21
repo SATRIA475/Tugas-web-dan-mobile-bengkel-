@@ -5,6 +5,8 @@ import authRoutes from './routes/authRoutes';
 import bookingRoutes from './routes/bookingRoutes';
 import adminRoutes from './routes/adminRoutes';
 import customerRoutes from './routes/customerRoutes';
+import chatRoutes from './routes/chatRoutes';
+import { initDatabase } from './lib/initDb';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -20,11 +22,16 @@ app.use('/api/auth', authRoutes);
 app.use('/api/booking', bookingRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/customer', customerRoutes);
+app.use('/api/chat', chatRoutes);
 
 app.get('/', (req, res) => {
   res.send('Bengkel API is running!');
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+initDatabase()
+  .catch((err) => console.error('[initDb] Gagal menyiapkan database:', err))
+  .finally(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  });

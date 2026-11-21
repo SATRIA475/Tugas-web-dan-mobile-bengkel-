@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Platform, ScrollView, RefreshControl, ActivityIndicator, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, ScrollView, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { LogOut, Users, Settings, Clock } from 'lucide-react-native';
+import { Users, Wrench, CalendarClock, ChevronRight } from 'lucide-react-native';
 import api from '../../utils/api';
+import { Screen, Card, Button, IconTile } from '../../components/ui';
+import { colors, type } from '../../theme';
+import { AdminHeader, Loader } from './AdminShared';
 
 export default function AdminDashboardScreen({ navigation }: any) {
   const [stats, setStats] = useState({ bookingMenunggu: 0, totalLayanan: 0, totalPelanggan: 0 });
@@ -27,7 +30,7 @@ export default function AdminDashboardScreen({ navigation }: any) {
     useCallback(() => {
       const loadUser = async () => {
         const userDataStr = await AsyncStorage.getItem('userData');
-        if (userDataStr) setAdminName(JSON.parse(userDataStr).name);
+        if (userDataStr) setAdminName(JSON.parse(userDataStr).nama || 'Admin');
       };
       loadUser();
       setLoading(true);
@@ -46,70 +49,63 @@ export default function AdminDashboardScreen({ navigation }: any) {
     navigation.replace('Login');
   };
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Halo, {adminName}</Text>
-          <Text style={styles.brandText}>SATRA <Text style={styles.textPrimary}>GARAGE+</Text></Text>
-        </View>
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-          <LogOut color="#FFF" size={20} />
-        </TouchableOpacity>
-      </View>
+  const small = [
+    { label: 'Total pelanggan', value: stats?.totalPelanggan ?? 0, Icon: Users, tone: 'info' as const, fg: colors.info },
+    { label: 'Total layanan', value: stats?.totalLayanan ?? 0, Icon: Wrench, tone: 'success' as const, fg: colors.success },
+  ];
 
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#DC2626']} />}
+  return (
+    <Screen>
+      <AdminHeader onLogout={handleLogout} />
+
+      <ScrollView
+        contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.primary]} tintColor={colors.primary} />}
       >
-        <Text style={styles.sectionTitle}>STATISTIK <Text style={styles.textPrimary}>BENGKEL</Text></Text>
-        
+        <Text style={[type.body, { fontSize: 14, color: colors.mutedForeground }]}>Halo, {adminName}</Text>
+        <Text style={[type.display, { fontSize: 26, lineHeight: 32, color: colors.foreground, marginTop: 4 }]}>Ringkasan hari ini</Text>
+        <Text style={[type.body, { fontSize: 14, lineHeight: 20, color: colors.mutedForeground, marginTop: 6, marginBottom: 20 }]}>
+          Pantau antrean dan data bengkel secara real-time.
+        </Text>
+
         {loading ? (
-          <ActivityIndicator size="large" color="#DC2626" style={{ marginTop: 50 }} />
+          <Loader />
         ) : (
-          <View style={styles.statsContainer}>
-            <View style={styles.statCard}>
-              <View style={[styles.iconWrap, { backgroundColor: 'rgba(234,179,8,0.2)' }]}>
-                <Clock color="#EAB308" size={32} />
+          <View style={{ gap: 12 }}>
+            <Card highlight style={{ padding: 18 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <IconTile tone="primary">
+                  <CalendarClock color={colors.primary} size={22} />
+                </IconTile>
+                <Text style={[type.label, { fontSize: 12.5, color: colors.primary }]}>Perlu ditangani</Text>
               </View>
-              <Text style={styles.statNumber}>{stats.bookingMenunggu}</Text>
-              <Text style={styles.statLabel}>BOOKING MENUNGGU</Text>
-            </View>
-            
-            <View style={styles.statCard}>
-              <View style={[styles.iconWrap, { backgroundColor: 'rgba(59,130,246,0.2)' }]}>
-                <Users color="#3B82F6" size={32} />
-              </View>
-              <Text style={styles.statNumber}>{stats.totalPelanggan}</Text>
-              <Text style={styles.statLabel}>TOTAL PELANGGAN</Text>
-            </View>
-            
-            <View style={styles.statCard}>
-              <View style={[styles.iconWrap, { backgroundColor: 'rgba(34,197,94,0.2)' }]}>
-                <Settings color="#22C55E" size={32} />
-              </View>
-              <Text style={styles.statNumber}>{stats.totalLayanan}</Text>
-              <Text style={styles.statLabel}>LAYANAN TERSEDIA</Text>
+              <Text style={[type.display, { fontSize: 40, lineHeight: 46, color: colors.foreground, marginTop: 14 }]}>
+                {stats?.bookingMenunggu ?? 0}
+              </Text>
+              <Text style={[type.body, { fontSize: 14, color: colors.mutedForeground }]}>Booking menunggu</Text>
+            </Card>
+
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              {small.map(({ label, value, Icon, tone, fg }) => (
+                <Card key={label} style={{ flex: 1, padding: 16 }}>
+                  <IconTile tone={tone} size={40}>
+                    <Icon color={fg} size={20} />
+                  </IconTile>
+                  <Text style={[type.display, { fontSize: 28, lineHeight: 34, color: colors.foreground, marginTop: 12 }]}>{value}</Text>
+                  <Text style={[type.body, { fontSize: 13, color: colors.mutedForeground }]}>{label}</Text>
+                </Card>
+              ))}
             </View>
           </View>
         )}
+
+        <Button
+          title="Kelola semua booking"
+          onPress={() => navigation.navigate('Transaksi')}
+          icon={<ChevronRight color={colors.primaryForeground} size={18} />}
+          style={{ marginTop: 20 }}
+        />
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#F1F5F9', paddingTop: Platform.OS === 'android' ? 30 : 0 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, backgroundColor: '#1E293B', borderBottomWidth: 4, borderBottomColor: '#DC2626' },
-  greeting: { color: '#94A3B8', fontSize: 12, fontWeight: 'bold', marginBottom: 2 },
-  brandText: { fontSize: 24, fontWeight: '900', fontStyle: 'italic', color: '#FFF' },
-  textPrimary: { color: '#DC2626' },
-  logoutBtn: { backgroundColor: '#DC2626', padding: 10, borderRadius: 50 },
-  scrollContent: { padding: 20 },
-  sectionTitle: { fontSize: 20, fontWeight: '900', fontStyle: 'italic', color: '#0F172A', marginBottom: 20 },
-  statsContainer: { gap: 16 },
-  statCard: { backgroundColor: '#FFF', padding: 24, borderWidth: 2, borderColor: '#0F172A', borderLeftWidth: 8, borderLeftColor: '#0F172A', elevation: 2, shadowColor: '#000', shadowOffset: { width: 4, height: 4 }, shadowOpacity: 0.1, shadowRadius: 0, flexDirection: 'row', alignItems: 'center', gap: 20 },
-  iconWrap: { width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center' },
-  statNumber: { fontSize: 36, fontWeight: '900', fontStyle: 'italic', color: '#0F172A', flex: 1 },
-  statLabel: { fontSize: 12, fontWeight: '900', color: '#64748B', width: 100, textAlign: 'right' }
-});

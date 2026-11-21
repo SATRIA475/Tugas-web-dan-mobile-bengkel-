@@ -1,53 +1,47 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Platform, TouchableOpacity, ScrollView } from 'react-native';
-import { Users, Car, Settings, ChevronRight } from 'lucide-react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { Users, Bike, Wrench, ChevronRight } from 'lucide-react-native';
+import { Screen, Card, SectionTitle, IconTile } from '../../components/ui';
+import { colors, type } from '../../theme';
+import { AdminHeader } from './AdminShared';
 
 export default function AdminDataMenuScreen({ navigation }: any) {
   const menus = [
-    { id: 1, title: 'DATA PELANGGAN', desc: 'Kelola informasi member bengkel', icon: Users, route: 'Pelanggan', color: '#3B82F6' },
-    { id: 2, title: 'DATA KENDARAAN', desc: 'Daftar garasi motor seluruh pelanggan', icon: Car, route: 'Kendaraan', color: '#DC2626' },
-    { id: 3, title: 'DATA LAYANAN', desc: 'Katalog servis dan biaya', icon: Settings, route: 'Layanan', color: '#22C55E' },
+    { id: 1, title: 'Data pelanggan', desc: 'Pengguna yang terdaftar sebagai member.', icon: Users, route: 'Pelanggan', tone: 'info' as const, fg: colors.info },
+    { id: 2, title: 'Data kendaraan', desc: 'Kendaraan milik pelanggan.', icon: Bike, route: 'Kendaraan', tone: 'primary' as const, fg: colors.primary },
+    { id: 3, title: 'Data layanan', desc: 'Paket servis, harga, dan estimasi waktu.', icon: Wrench, route: 'Layanan', tone: 'success' as const, fg: colors.success },
   ];
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>MASTER <Text style={{color: '#DC2626'}}>DATA</Text></Text>
-      </View>
-      
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.sectionDesc}>Pilih kategori data yang ingin Anda lihat.</Text>
+    <Screen>
+      <AdminHeader />
 
-        {menus.map((menu) => (
-          <TouchableOpacity 
-            key={menu.id} 
-            style={styles.menuCard}
-            onPress={() => navigation.navigate(menu.route)}
-          >
-            <View style={[styles.iconWrap, { backgroundColor: `${menu.color}20` }]}>
-              <menu.icon color={menu.color} size={32} />
-            </View>
-            <View style={styles.menuInfo}>
-              <Text style={styles.menuTitle}>{menu.title}</Text>
-              <Text style={styles.menuDesc}>{menu.desc}</Text>
-            </View>
-            <ChevronRight color="#0F172A" size={24} />
-          </TouchableOpacity>
-        ))}
+      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
+        <SectionTitle title="Master data" subtitle="Pilih kategori data yang ingin dilihat." />
+
+        <Card>
+          {menus.map((menu, i) => (
+            <TouchableOpacity
+              key={menu.id}
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate(menu.route)}
+              style={[
+                { padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14 },
+                i > 0 && { borderTopWidth: 1, borderTopColor: colors.border },
+              ]}
+            >
+              <IconTile tone={menu.tone}>
+                <menu.icon color={menu.fg} size={22} />
+              </IconTile>
+              <View style={{ flex: 1 }}>
+                <Text style={[type.label, { fontSize: 15, fontWeight: '700', color: colors.foreground }]}>{menu.title}</Text>
+                <Text style={[type.body, { fontSize: 13, color: colors.mutedForeground, marginTop: 2 }]}>{menu.desc}</Text>
+              </View>
+              <ChevronRight color={colors.mutedForeground} size={20} />
+            </TouchableOpacity>
+          ))}
+        </Card>
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#F1F5F9', paddingTop: Platform.OS === 'android' ? 30 : 0 },
-  header: { padding: 20, backgroundColor: '#0F172A', borderBottomWidth: 4, borderBottomColor: '#DC2626', alignItems: 'center' },
-  headerTitle: { color: '#FFF', fontSize: 24, fontWeight: '900', fontStyle: 'italic', textTransform: 'uppercase' },
-  scrollContent: { padding: 20 },
-  sectionDesc: { fontSize: 14, color: '#64748B', fontWeight: 'bold', marginBottom: 20 },
-  menuCard: { backgroundColor: '#FFF', padding: 20, marginBottom: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 2, borderColor: '#0F172A', borderLeftWidth: 6, borderLeftColor: '#0F172A', elevation: 2 },
-  iconWrap: { width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
-  menuInfo: { flex: 1 },
-  menuTitle: { fontSize: 16, fontWeight: '900', fontStyle: 'italic', color: '#0F172A', marginBottom: 4 },
-  menuDesc: { fontSize: 12, color: '#64748B', fontWeight: 'bold' }
-});

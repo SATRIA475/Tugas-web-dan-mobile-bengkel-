@@ -89,3 +89,29 @@ INSERT INTO layanan (id, nama_layanan, deskripsi, harga, estimasi_waktu) VALUES
 (UUID(), 'Ganti Oli Mesin', 'Ganti oli mesin standar pabrik.', 65000.00, 30),
 (UUID(), 'Ganti Kampas Rem', 'Ganti kampas rem depan atau belakang.', 85000.00, 45),
 (UUID(), 'Tune Up Injeksi', 'Pembersihan injektor, throttle body, reset ECU.', 200000.00, 90);
+
+-- f. Live chat (AI + admin bengkel)
+CREATE TABLE IF NOT EXISTS chat_percakapan (
+  id VARCHAR(64) PRIMARY KEY,
+  pelanggan_id VARCHAR(191) NULL,
+  nama_tamu VARCHAR(191) NULL,
+  mode ENUM('AI', 'ADMIN') NOT NULL DEFAULT 'AI',
+  butuh_admin TINYINT(1) NOT NULL DEFAULT 0,
+  belum_dibaca_admin INT NOT NULL DEFAULT 0,
+  createdAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updatedAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  INDEX idx_chat_updated (updatedAt),
+  CONSTRAINT fk_chat_pelanggan FOREIGN KEY (pelanggan_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS chat_pesan (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  percakapan_id VARCHAR(64) NOT NULL,
+  pengirim ENUM('PELANGGAN', 'AI', 'ADMIN', 'SISTEM') NOT NULL,
+  admin_id VARCHAR(191) NULL,
+  isi TEXT NOT NULL,
+  createdAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  INDEX idx_pesan_percakapan (percakapan_id, id),
+  CONSTRAINT fk_pesan_percakapan FOREIGN KEY (percakapan_id) REFERENCES chat_percakapan(id) ON DELETE CASCADE,
+  CONSTRAINT fk_pesan_admin FOREIGN KEY (admin_id) REFERENCES users(id) ON DELETE SET NULL
+);

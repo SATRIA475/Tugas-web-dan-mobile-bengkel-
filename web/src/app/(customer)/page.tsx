@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { CheckCircle2, Clock, ShieldCheck, Wrench, ChevronRight, Star } from 'lucide-react'
+import { CheckCircle2, Clock, ShieldCheck, Wrench, ChevronRight, ChevronDown, Star } from 'lucide-react'
 import { getSession } from '@/lib/auth'
 
 export default async function CustomerHomePage() {
@@ -10,6 +10,15 @@ export default async function CustomerHomePage() {
     { id: '1', namaLayanan: 'Servis Rutin Ringan', deskripsi: 'Ganti oli, cek kampas rem, busi, dan tegangan aki dengan presisi.', harga: 150000, estimasiWaktu: 60, popular: true },
     { id: '2', namaLayanan: 'Servis Besar / Berat', deskripsi: 'Bongkar mesin (turun mesin), ganti piston, dan restorasi performa.', harga: 750000, estimasiWaktu: 360, popular: false },
     { id: '3', namaLayanan: 'Ganti Oli Mesin', deskripsi: 'Ganti oli mesin standar pabrik dengan jaminan pelumas orisinil.', harga: 65000, estimasiWaktu: 30, popular: false }
+  ];
+
+  const faqs = [
+    { q: 'Bagaimana cara booking servis?', a: 'Klik tombol "Booking Sekarang", pilih kendaraan, layanan, dan jadwal yang Anda inginkan. Anda perlu login atau daftar member terlebih dahulu.' },
+    { q: 'Apakah harus daftar member untuk servis?', a: 'Untuk booking online, ya. Dengan akun member Anda bisa menyimpan data kendaraan dan melihat riwayat servis kapan saja.' },
+    { q: 'Berapa lama waktu pengerjaan servis?', a: 'Tergantung layanan. Servis rutin sekitar 60 menit, ganti oli sekitar 30 menit, dan servis besar bisa sampai 6 jam. Estimasi tertera di setiap layanan.' },
+    { q: 'Apakah suku cadangnya orisinil?', a: 'Ya. Kami hanya memakai suku cadang orisinil dan merek performa dari partner resmi seperti BRT, UMA Racing, TDR, KYB, dan lainnya.' },
+    { q: 'Metode pembayaran apa saja yang diterima?', a: 'Pembayaran dilakukan di kasir bengkel setelah servis selesai. Rincian biaya selalu transparan sebelum pengerjaan.' },
+    { q: 'Siapa yang mengembangkan website Satra Garage+?', a: 'Website ini dikembangkan oleh Riansa Putra (Backend dan SRS) dan Satria Arief Wibowo (Fullstack Developer).' },
   ];
 
   return (
@@ -145,39 +154,27 @@ export default async function CustomerHomePage() {
           </div>
         </div>
       </section>
-      {/* Developer Team Section */}
-      <section className="w-full py-32 bg-card relative border-b-4 border-foreground overflow-hidden">
+      {/* FAQ Section */}
+      <section id="faq" className="w-full py-32 bg-card relative border-b-4 border-foreground overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10" />
-        <div className="container mx-auto px-6 text-center relative z-10">
-          <div className="mb-16">
-            <h2 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-foreground border-b-8 border-primary pb-2 inline-block">Web <span className="text-primary">Developers</span></h2>
-            <p className="mt-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">The minds behind Satra Garage+</p>
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="mb-16 text-center">
+            <h2 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-foreground border-b-8 border-primary pb-2 inline-block">Pertanyaan <span className="text-primary">Umum</span></h2>
+            <p className="mt-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Yang sering ditanyakan tentang Satra Garage+</p>
           </div>
-          
-          <div className="flex flex-col md:flex-row justify-center items-center gap-12 md:gap-20">
-            {/* Dev 1 */}
-            <div className="group relative flex flex-col items-center">
-              <div className="w-64 h-80 relative overflow-hidden border-4 border-foreground shadow-[8px_8px_0px_rgba(220,38,38,1)] skew-x-[-3deg] transition-transform duration-300 group-hover:-translate-y-3 group-hover:shadow-[12px_12px_0px_rgba(220,38,38,1)]">
-                <div className="absolute inset-0 bg-blue-600/20 z-10 mix-blend-multiply skew-x-[3deg]"></div>
-                <Image src="/riansa.jpg" alt="Riansa Putra" fill className="object-cover skew-x-[3deg] scale-110 group-hover:scale-105 transition-transform duration-500" />
-              </div>
-              <div className="mt-8 bg-foreground text-background px-6 py-3 skew-x-[-10deg] border-2 border-primary">
-                <h3 className="text-xl font-black uppercase italic tracking-wider skew-x-[10deg]">Riansa Putra</h3>
-              </div>
-              <p className="mt-3 text-sm font-bold uppercase text-foreground/70 tracking-widest">Backend dan SRS</p>
-            </div>
-            
-            {/* Dev 2 */}
-            <div className="group relative flex flex-col items-center">
-              <div className="w-64 h-80 relative overflow-hidden border-4 border-foreground shadow-[8px_8px_0px_rgba(220,38,38,1)] skew-x-[-3deg] transition-transform duration-300 group-hover:-translate-y-3 group-hover:shadow-[12px_12px_0px_rgba(220,38,38,1)]">
-                <div className="absolute inset-0 bg-blue-600/20 z-10 mix-blend-multiply skew-x-[3deg]"></div>
-                <Image src="/satria.jpg" alt="Satria Arief Wibowo" fill className="object-cover skew-x-[3deg] scale-110 group-hover:scale-105 transition-transform duration-500" />
-              </div>
-              <div className="mt-8 bg-foreground text-background px-6 py-3 skew-x-[-10deg] border-2 border-primary">
-                <h3 className="text-xl font-black uppercase italic tracking-wider skew-x-[10deg]">Satria Arief Wibowo</h3>
-              </div>
-              <p className="mt-3 text-sm font-bold uppercase text-foreground/70 tracking-widest">Fullstack Developer</p>
-            </div>
+
+          <div className="max-w-3xl mx-auto flex flex-col gap-5">
+            {faqs.map((faq) => (
+              <details key={faq.q} className="group bg-background border-4 border-foreground shadow-[6px_6px_0px_rgba(220,38,38,1)] open:shadow-[8px_8px_0px_rgba(220,38,38,1)] transition-shadow">
+                <summary className="flex items-center justify-between gap-4 cursor-pointer list-none p-5 md:p-6 [&::-webkit-details-marker]:hidden">
+                  <span className="text-base md:text-lg font-black uppercase italic text-foreground">{faq.q}</span>
+                  <ChevronDown className="h-6 w-6 shrink-0 text-primary transition-transform duration-300 group-open:rotate-180" />
+                </summary>
+                <div className="px-5 md:px-6 pb-6 -mt-1 text-foreground/80 font-bold leading-relaxed border-t-2 border-foreground/10 pt-4">
+                  {faq.a}
+                </div>
+              </details>
+            ))}
           </div>
         </div>
       </section>
@@ -190,7 +187,7 @@ export default async function CustomerHomePage() {
             <p className="mt-2 text-sm font-bold uppercase tracking-wider text-muted-foreground">Suku cadang performa tinggi berstandar kompetisi.</p>
           </div>
           
-          <div className="flex flex-wrap justify-center gap-6 md:gap-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 justify-items-center place-items-center gap-6 md:gap-10 max-w-4xl mx-auto">
             {[
               { name: 'BRT', file: 'brt1.png' }, 
               { name: 'UMA RACING', file: 'uma-racing.png' }, 

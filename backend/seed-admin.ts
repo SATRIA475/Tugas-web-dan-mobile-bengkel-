@@ -4,9 +4,10 @@ import crypto from 'crypto';
 
 async function seedAdmin() {
   try {
-    const adminEmail = 'admin@satra.com';
-    const adminPassword = 'admin'; // simple password for local dev
-    const adminName = 'Administrator';
+    // Untuk lokal default admin@satra.com / admin. Di server, isi ADMIN_EMAIL & ADMIN_PASSWORD.
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@satra.com';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin';
+    const adminName = process.env.ADMIN_NAME || 'Administrator';
 
     const [rows] = await pool.query('SELECT id FROM users WHERE email = ?', [adminEmail]);
     
@@ -26,7 +27,6 @@ async function seedAdmin() {
 
     console.log('Admin user created successfully!');
     console.log(`Email: ${adminEmail}`);
-    console.log(`Password: ${adminPassword}`);
     process.exit(0);
   } catch (error) {
     console.error('Error seeding admin:', error);

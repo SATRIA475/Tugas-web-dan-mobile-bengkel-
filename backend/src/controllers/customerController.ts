@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { Request, Response } from 'express';
 import { pool } from '../lib/db';
 import { RowDataPacket } from 'mysql2';
@@ -52,5 +53,48 @@ export const getProfile = async (req: Request, res: Response) => {
     }
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch profile' });
+  }
+};
+
+export const addKendaraan = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { plat_nomor, merk, tipe, tahun } = req.body;
+
+    if (!plat_nomor || !merk || !tipe) {
+      return res.status(400).json({ error: 'Plat nomor, merk, dan tipe wajib diisi' });
+    }
+
+    const plat = String(plat_nomor).trim().toUpperCase();
+    const [existing] = await pool.query<RowDataPacket[]>('SELECT id FROM kendaraan WHERE plat_nomor = ?', [plat]);
+    if (existing.length > 0) {
+      return res.status(409).json({ error: 'Plat nomor sudah terdaftar' });
+    }
+
+    const id = crypto.randomUUID();
+    const tahunNum = tahun ? parseInt(String(tahun), 10) : null;
+    await pool.query(
+      'INSERT INTO kendaraan (id, user_id, plat_nomor, merk, tipe, tahun) VALUES (?, ?, ?, ?, ?, ?)',
+      [id, userId, plat, String(merk).trim(), String(tipe).trim(), Number.isNaN(tahunNum) ? null : tahunNum]
+    );
+    res.status(201).json({ message: 'Kendaraan berhasil ditambahkan', id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Gagal menambahkan kendaraan' });
+  }
+};
+
+export const deleteKendaraan = async (req: Request, res: Response) => {
+  try {
+    const { userId, id } = req.params;
+    // Hanya hapus kendaraan milik user tersebut
+    const [result]: any = await pool.query('DELETE FROM kendaraan WHERE id = ? AND user_id = ?', [id, userId]);
+    if (!result.affectedRows) {
+      return res.status(404).json({ error: 'Kendaraan tidak ditemukan' });
+    }
+    res.json({ message: 'Kendaraan berhasil dihapus' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Gagal menghapus kendaraan' });
   }
 };

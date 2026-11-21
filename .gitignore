@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Environment / secrets (lihat *.env.example untuk contoh isinya)
+.env
+.env.*
+!.env.example
+
+# Build & tooling
+.next/
+.vercel/
+.expo/
+dist/
+*.tsbuildinfo
+
+# Editor / lokal
+.vscode/
+.claude/
+.DS_Store

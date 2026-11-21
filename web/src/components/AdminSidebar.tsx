@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, Bike, Wrench, Calendar, Banknote, LogOut, Menu, X } from 'lucide-react'
+import { LayoutDashboard, Users, Bike, Wrench, Calendar, Banknote, LogOut, Menu, X, MessageCircle } from 'lucide-react'
 import { logout } from '@/app/actions/auth'
 
 export default function AdminSidebar() {
@@ -59,6 +59,11 @@ export default function AdminSidebar() {
             <li>
               <Link href="/admin/dashboard/kasir" onClick={close} className={`flex items-center gap-4 border-2 border-transparent px-4 py-3 text-sm font-black uppercase tracking-widest hover:border-foreground hover:bg-primary hover:text-primary-foreground transition-all skew-x-[-5deg] ${pathname === '/admin/dashboard/kasir' ? 'bg-primary text-primary-foreground' : ''}`}>
                 <span className="skew-x-[5deg] flex items-center gap-4"><Banknote className="h-5 w-5" /> Kasir (POS)</span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/admin/dashboard/chat" onClick={close} className={`flex items-center gap-4 border-2 border-transparent px-4 py-3 text-sm font-black uppercase tracking-widest hover:border-foreground hover:bg-foreground hover:text-background transition-all skew-x-[-5deg] ${pathname === '/admin/dashboard/chat' ? 'bg-foreground text-background' : ''}`}>
+                <span className="skew-x-[5deg] flex items-center gap-4"><MessageCircle className="h-5 w-5" /> Live Chat</span>
               </Link>
             </li>
             

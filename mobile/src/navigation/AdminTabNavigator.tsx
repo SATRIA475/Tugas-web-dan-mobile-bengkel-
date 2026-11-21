@@ -1,7 +1,9 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LayoutDashboard, Wallet, ReceiptText, Database } from 'lucide-react-native';
+import { colors } from '../theme';
 
 import AdminDashboardScreen from '../screens/admin/AdminDashboardScreen';
 import AdminKasirScreen from '../screens/admin/AdminKasirScreen';
@@ -40,26 +42,27 @@ function AdminDataStack() {
 }
 
 export default function AdminTabNavigator() {
+  const insets = useSafeAreaInsets();
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#DC2626', // Red
-        tabBarInactiveTintColor: '#94A3B8', // Gray
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.mutedForeground,
         tabBarStyle: {
-          backgroundColor: '#0F172A', // Dark
-          borderTopWidth: 2,
-          borderTopColor: '#DC2626',
-          paddingBottom: 5,
-          paddingTop: 5,
-          height: 60,
+          backgroundColor: colors.card,
+          borderTopWidth: 1,
+          borderTopColor: colors.border,
+          paddingTop: 6,
+          paddingBottom: 6 + insets.bottom,
+          height: 64 + insets.bottom,
+          elevation: 0,
+          shadowOpacity: 0,
         },
         tabBarLabelStyle: {
-          fontWeight: '900',
-          fontStyle: 'italic',
-          textTransform: 'uppercase',
-          fontSize: 10,
-        }
+          fontWeight: '600',
+          fontSize: 11,
+        },
       }}
     >
       <Tab.Screen 
@@ -91,7 +94,7 @@ export default function AdminTabNavigator() {
         component={AdminDataStack} 
         options={{
           tabBarIcon: ({ color, size }) => <Database color={color} size={size} />,
-          tabBarLabel: 'Master Data'
+          tabBarLabel: 'Master data'
         }}
       />
     </Tab.Navigator>

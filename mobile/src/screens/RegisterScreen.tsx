@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity } from 'react-native';
+import { ChevronLeft } from 'lucide-react-native';
 import api from '../utils/api';
-import { UserPlus } from 'lucide-react-native';
+import { Screen, Card, Button, Field, Brand, Logo } from '../components/ui';
+import { colors, type } from '../theme';
 
 export default function RegisterScreen({ navigation }: any) {
   const [name, setName] = useState('');
@@ -18,12 +20,12 @@ export default function RegisterScreen({ navigation }: any) {
 
     setLoading(true);
     try {
-      const response = await api.post('/auth/register', { name, email, password, phone });
+      await api.post('/auth/register', { nama: name.trim(), email: email.trim(), password, no_telepon: phone.trim() });
       Alert.alert('Sukses', 'Registrasi berhasil! Silakan login.', [
-        { text: 'OK', onPress: () => navigation.replace('Login') }
+        { text: 'OK', onPress: () => navigation.replace('Login') },
       ]);
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Gagal registrasi.';
+      const message = error.response?.data?.error || error.response?.data?.message || 'Gagal registrasi.';
       Alert.alert('Registrasi Gagal', message);
     } finally {
       setLoading(false);
@@ -31,120 +33,58 @@ export default function RegisterScreen({ navigation }: any) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-          
-          <View style={styles.header}>
-            <Text style={styles.brandText}>SATRA <Text style={styles.brandTextPrimary}>GARAGE+</Text></Text>
-            <Text style={styles.subBrand}>NEW MEMBER REGISTRATION</Text>
-          </View>
-
-          <View style={styles.formContainer}>
-            <Text style={styles.title}>DAFTAR MEMBER</Text>
-            
-            <View style={styles.inputWrapper}>
-              <Text style={styles.label}>NAMA LENGKAP</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Nama Lengkap"
-                placeholderTextColor="#64748B"
-                value={name}
-                onChangeText={setName}
-              />
-            </View>
-
-            <View style={styles.inputWrapper}>
-              <Text style={styles.label}>EMAIL ADDRESS</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="email@example.com"
-                placeholderTextColor="#64748B"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
-            
-            <View style={styles.inputWrapper}>
-              <Text style={styles.label}>NOMOR TELEPON / WA</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="081234567890"
-                placeholderTextColor="#64748B"
-                value={phone}
-                onChangeText={setPhone}
-                keyboardType="phone-pad"
-              />
-            </View>
-
-            <View style={styles.inputWrapper}>
-              <Text style={styles.label}>PASSWORD</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="••••••••"
-                placeholderTextColor="#64748B"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-              />
-            </View>
-
-            <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
-              {loading ? (
-                <ActivityIndicator color="#FFF" />
-              ) : (
-                <View style={styles.buttonContent}>
-                  <UserPlus color="#FFF" size={20} />
-                  <Text style={styles.buttonText}>DAFTAR SEKARANG</Text>
-                </View>
-              )}
+    <Screen edges={['top', 'bottom']}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          {navigation.canGoBack() && (
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back} hitSlop={8}>
+              <ChevronLeft color={colors.mutedForeground} size={18} />
+              <Text style={[type.label, { fontSize: 14, color: colors.mutedForeground }]}>Kembali</Text>
             </TouchableOpacity>
+          )}
 
-            <View style={styles.loginContainer}>
-              <Text style={styles.loginText}>SUDAH PUNYA AKUN? </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.loginLink}>LOGIN DI SINI</Text>
-              </TouchableOpacity>
+          <View style={styles.head}>
+            <Logo size={64} />
+            <View style={{ marginTop: 14 }}>
+              <Brand size={22} />
             </View>
+            <Text style={[type.display, styles.title]}>Buat akun member</Text>
+            <Text style={[type.body, styles.subtitle]}>Daftar gratis untuk menyimpan data motor dan booking lebih cepat.</Text>
           </View>
 
+          <Card style={{ padding: 20 }}>
+            <Field label="Nama lengkap" placeholder="Nama lengkap" value={name} onChangeText={setName} />
+            <Field
+              label="Email"
+              placeholder="nama@email.com"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <Field label="Nomor telepon / WA" placeholder="081234567890" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
+            <Field label="Password" placeholder="••••••••" value={password} onChangeText={setPassword} secureTextEntry />
+
+            <Button title="Daftar" onPress={handleRegister} loading={loading} style={{ marginTop: 4 }} />
+          </Card>
+
+          <View style={styles.footRow}>
+            <Text style={[type.body, { fontSize: 14, color: colors.mutedForeground }]}>Sudah punya akun? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')} hitSlop={8}>
+              <Text style={[type.label, { fontSize: 14, fontWeight: '700', color: colors.primary }]}>Masuk di sini</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#0F172A' },
-  container: { flex: 1 },
-  scrollContent: { padding: 24, paddingVertical: 40, flexGrow: 1, justifyContent: 'center' },
-  header: { alignItems: 'center', marginBottom: 40 },
-  brandText: { fontSize: 32, fontWeight: '900', fontStyle: 'italic', color: '#FFF' },
-  brandTextPrimary: { color: '#DC2626' },
-  subBrand: { fontSize: 12, fontWeight: 'bold', color: '#94A3B8', letterSpacing: 2, marginTop: 4 },
-  formContainer: { 
-    backgroundColor: '#1E293B', 
-    padding: 24, 
-    borderWidth: 2, 
-    borderColor: '#334155',
-    borderLeftWidth: 8,
-    borderLeftColor: '#DC2626',
-    shadowColor: '#000',
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 0,
-    elevation: 5
-  },
-  title: { fontSize: 24, fontWeight: '900', color: '#FFF', fontStyle: 'italic', marginBottom: 24, borderBottomWidth: 2, borderBottomColor: '#DC2626', paddingBottom: 8, alignSelf: 'flex-start' },
-  inputWrapper: { marginBottom: 20 },
-  label: { fontSize: 12, fontWeight: 'bold', color: '#94A3B8', marginBottom: 8, letterSpacing: 1 },
-  input: { backgroundColor: '#0F172A', borderWidth: 2, borderColor: '#334155', color: '#FFF', padding: 16, fontSize: 16, fontWeight: 'bold' },
-  button: { backgroundColor: '#DC2626', padding: 18, alignItems: 'center', marginTop: 10, borderWidth: 2, borderColor: '#FFF' },
-  buttonContent: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  buttonText: { color: '#FFF', fontSize: 18, fontWeight: '900', fontStyle: 'italic', marginLeft: 8 },
-  loginContainer: { flexDirection: 'row', justifyContent: 'center', marginTop: 24 },
-  loginText: { color: '#94A3B8', fontSize: 12, fontWeight: 'bold' },
-  loginLink: { color: '#DC2626', fontSize: 12, fontWeight: 'bold', textDecorationLine: 'underline' }
+  container: { flexGrow: 1, paddingHorizontal: 20, paddingVertical: 24, justifyContent: 'center' },
+  back: { flexDirection: 'row', alignItems: 'center', gap: 2, alignSelf: 'flex-start', marginBottom: 16, marginLeft: -4 },
+  head: { alignItems: 'center', marginBottom: 28 },
+  title: { fontSize: 24, color: colors.foreground, marginTop: 20, textAlign: 'center' },
+  subtitle: { fontSize: 14.5, lineHeight: 21, color: colors.mutedForeground, marginTop: 6, textAlign: 'center', maxWidth: 300 },
+  footRow: { flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', marginTop: 20 },
 });

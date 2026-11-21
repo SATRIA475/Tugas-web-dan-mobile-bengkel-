@@ -1,15 +1,17 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Platform, ScrollView, RefreshControl, ActivityIndicator, TouchableOpacity, TextInput, Alert } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, ActivityIndicator, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../utils/api';
+import { requireUser } from '../utils/session';
 import { Motorbike, Plus, Trash2 } from 'lucide-react-native';
+import { Screen, AppHeader, Card, SectionTitle, Button, Field, Badge, EmptyState, IconTile } from '../components/ui';
+import { colors, type, radius } from '../theme';
 
-export default function VehicleScreen() {
+export default function VehicleScreen({ navigation }: any) {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  
+
   // State for new vehicle
   const [platNomor, setPlatNomor] = useState('');
   const [merek, setMerek] = useState('');
@@ -19,10 +21,10 @@ export default function VehicleScreen() {
 
   const fetchVehicles = async () => {
     try {
-      const userDataStr = await AsyncStorage.getItem('userData');
-      const userId = userDataStr ? JSON.parse(userDataStr).id : 1;
-      const response = await api.get(`/customer/vehicles/${userId}`);
-      setVehicles(response.data);
+      const user = await requireUser(navigation);
+      if (!user) return;
+      const response = await api.get(`/customer/vehicles/${user.id}`);
+      setVehicles(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching vehicles:', error);
     } finally {
@@ -44,139 +46,144 @@ export default function VehicleScreen() {
   };
 
   const handleAddVehicle = async () => {
-    if (!platNomor || !merek || !model || !tahun) {
-      Alert.alert('Error', 'Semua data kendaraan harus diisi.');
+    if (!platNomor || !merek || !model) {
+      Alert.alert('Error', 'Plat nomor, merek, dan tipe wajib diisi.');
       return;
     }
+    const user = await requireUser(navigation);
+    if (!user) return;
 
     setAdding(true);
     try {
-      await api.post('/customer/kendaraan', { platNomor, merek, model, tahun: parseInt(tahun) });
+      await api.post(`/customer/vehicles/${user.id}`, {
+        plat_nomor: platNomor.trim().toUpperCase(),
+        merk: merek.trim(),
+        tipe: model.trim(),
+        tahun: tahun ? parseInt(tahun, 10) : null,
+      });
       Alert.alert('Sukses', 'Kendaraan berhasil ditambahkan.');
-      setPlatNomor(''); setMerek(''); setModel(''); setTahun('');
+      setPlatNomor('');
+      setMerek('');
+      setModel('');
+      setTahun('');
       fetchVehicles();
     } catch (error: any) {
-      Alert.alert('Gagal', error.response?.data?.message || 'Gagal menambahkan kendaraan.');
+      Alert.alert('Gagal', error.response?.data?.error || 'Gagal menambahkan kendaraan.');
     } finally {
       setAdding(false);
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     Alert.alert('Konfirmasi', 'Hapus kendaraan ini dari garasi?', [
       { text: 'Batal', style: 'cancel' },
-      { 
-        text: 'Hapus', 
+      {
+        text: 'Hapus',
         style: 'destructive',
         onPress: async () => {
+          const user = await requireUser(navigation);
+          if (!user) return;
           try {
-            await api.delete(`/customer/kendaraan/${id}`);
+            await api.delete(`/customer/vehicles/${user.id}/${id}`);
             fetchVehicles();
           } catch (error) {
             Alert.alert('Gagal', 'Tidak dapat menghapus kendaraan.');
           }
-        }
-      }
+        },
+      },
     ]);
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>GARASI <Text style={{color: '#DC2626'}}>KENDARAAN</Text></Text>
-      </View>
-      
+    <Screen>
+      <AppHeader subtitle="Garasi saya" />
+
       {loading ? (
-        <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#DC2626" />
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       ) : (
-        <ScrollView 
-          contentContainerStyle={styles.scrollContent}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#DC2626']} />}
-        >
-          {/* Add Vehicle Form */}
-          <View style={styles.addForm}>
-            <Text style={styles.sectionTitle}>TAMBAH KENDARAAN BARU</Text>
-            
-            <View style={styles.inputRow}>
-              <View style={[styles.inputWrapper, { flex: 1 }]}>
-                <Text style={styles.label}>PLAT NOMOR</Text>
-                <TextInput style={styles.input} placeholder="B 1234 XYZ" value={platNomor} onChangeText={setPlatNomor} autoCapitalize="characters" />
-              </View>
-              <View style={[styles.inputWrapper, { flex: 1 }]}>
-                <Text style={styles.label}>TAHUN</Text>
-                <TextInput style={styles.input} placeholder="2020" value={tahun} onChangeText={setTahun} keyboardType="number-pad" />
-              </View>
-            </View>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+          <ScrollView
+            contentContainerStyle={styles.scroll}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.primary]} tintColor={colors.primary} />}
+          >
+            <SectionTitle title="Garasi saya" subtitle="Simpan data motor agar booking lebih cepat." />
 
-            <View style={styles.inputRow}>
-              <View style={[styles.inputWrapper, { flex: 1 }]}>
-                <Text style={styles.label}>MEREK</Text>
-                <TextInput style={styles.input} placeholder="Honda" value={merek} onChangeText={setMerek} />
-              </View>
-              <View style={[styles.inputWrapper, { flex: 1 }]}>
-                <Text style={styles.label}>MODEL</Text>
-                <TextInput style={styles.input} placeholder="CBR 150R" value={model} onChangeText={setModel} />
-              </View>
-            </View>
+            {/* Form tambah kendaraan */}
+            <Card style={{ padding: 20 }}>
+              <Text style={[type.display, styles.cardTitle]}>Tambah kendaraan</Text>
 
-            <TouchableOpacity style={styles.addButton} onPress={handleAddVehicle} disabled={adding}>
-              {adding ? <ActivityIndicator color="#FFF" /> : (
-                <>
-                  <Plus color="#FFF" size={20} />
-                  <Text style={styles.addButtonText}>TAMBAH KE GARASI</Text>
-                </>
-              )}
-            </TouchableOpacity>
-          </View>
-
-          {/* Vehicle List */}
-          <Text style={[styles.sectionTitle, { marginTop: 20 }]}>KENDARAAN ANDA</Text>
-          
-          {vehicles.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Motorbike color="#94A3B8" size={48} />
-              <Text style={styles.emptyText}>Belum ada kendaraan di garasi.</Text>
-            </View>
-          ) : (
-            vehicles.map((item) => (
-              <View key={item.id} style={styles.card}>
-                <View style={styles.cardInfo}>
-                  <Text style={styles.platNomor}>{item.platNomor}</Text>
-                  <Text style={styles.vehicleName}>{item.merek} {item.model} ({item.tahun})</Text>
+              <View style={styles.row}>
+                <View style={{ flex: 1 }}>
+                  <Field label="Plat nomor" placeholder="B 1234 XYZ" value={platNomor} onChangeText={setPlatNomor} autoCapitalize="characters" />
                 </View>
-                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id)}>
-                  <Trash2 color="#EF4444" size={24} />
-                </TouchableOpacity>
+                <View style={{ flex: 1 }}>
+                  <Field label="Tahun (opsional)" placeholder="2020" value={tahun} onChangeText={setTahun} keyboardType="number-pad" />
+                </View>
               </View>
-            ))
-          )}
-        </ScrollView>
+              <View style={styles.row}>
+                <View style={{ flex: 1 }}>
+                  <Field label="Merek" placeholder="Honda" value={merek} onChangeText={setMerek} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Field label="Tipe" placeholder="Vario 160" value={model} onChangeText={setModel} />
+                </View>
+              </View>
+
+              <Button
+                title="Tambah ke garasi"
+                onPress={handleAddVehicle}
+                loading={adding}
+                icon={<Plus color={colors.primaryForeground} size={18} />}
+              />
+            </Card>
+
+            {/* Daftar kendaraan */}
+            <View style={{ marginTop: 28 }}>
+              <SectionTitle title="Kendaraan Anda" />
+            </View>
+
+            {vehicles.length === 0 ? (
+              <EmptyState title="Garasi masih kosong" desc="Belum ada kendaraan di garasi. Tambahkan kendaraan pertama Anda di atas." />
+            ) : (
+              <Card>
+                {vehicles.map((item, i) => (
+                  <View key={item.id} style={[styles.vehicle, i > 0 && styles.divider]}>
+                    <IconTile>
+                      <Motorbike color={colors.primary} size={22} />
+                    </IconTile>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[type.label, { fontSize: 15, fontWeight: '700', color: colors.foreground }]}>
+                        {item.merk} {item.tipe}
+                      </Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                        <Badge text={item.plat_nomor} tone="dark" />
+                        {item.tahun ? <Text style={[type.body, { fontSize: 13, color: colors.mutedForeground }]}>Tahun {item.tahun}</Text> : null}
+                      </View>
+                    </View>
+                    <TouchableOpacity style={styles.delete} onPress={() => handleDelete(item.id)} hitSlop={6}>
+                      <Trash2 color={colors.primary} size={18} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </Card>
+            )}
+          </ScrollView>
+        </KeyboardAvoidingView>
       )}
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#F1F5F9', paddingTop: Platform.OS === 'android' ? 30 : 0 },
-  header: { padding: 20, backgroundColor: '#0F172A', borderBottomWidth: 4, borderBottomColor: '#DC2626', alignItems: 'center' },
-  headerTitle: { color: '#FFF', fontSize: 24, fontWeight: '900', fontStyle: 'italic', textTransform: 'uppercase' },
-  scrollContent: { padding: 20, paddingBottom: 40 },
-  centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  emptyContainer: { alignItems: 'center', marginTop: 40, padding: 20, backgroundColor: '#FFF', borderWidth: 2, borderColor: '#CBD5E1', borderStyle: 'dashed' },
-  emptyText: { color: '#94A3B8', fontSize: 16, fontWeight: 'bold', marginTop: 16 },
-  sectionTitle: { fontSize: 16, fontWeight: '900', fontStyle: 'italic', marginBottom: 12, color: '#0F172A' },
-  addForm: { backgroundColor: '#FFF', padding: 20, borderWidth: 2, borderColor: '#0F172A', elevation: 2, shadowColor: '#000', shadowOffset: { width: 4, height: 4 }, shadowOpacity: 0.1, shadowRadius: 0, marginBottom: 20 },
-  inputRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
-  inputWrapper: { },
-  label: { fontSize: 10, fontWeight: 'bold', color: '#64748B', marginBottom: 6 },
-  input: { backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#CBD5E1', padding: 12, fontSize: 14, fontWeight: 'bold' },
-  addButton: { backgroundColor: '#DC2626', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16, marginTop: 8 },
-  addButtonText: { color: '#FFF', fontSize: 14, fontWeight: '900', fontStyle: 'italic' },
-  card: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#FFF', padding: 16, marginBottom: 12, borderWidth: 2, borderColor: '#0F172A', borderLeftWidth: 6, borderLeftColor: '#DC2626' },
-  cardInfo: { flex: 1 },
-  platNomor: { fontSize: 20, fontWeight: '900', color: '#0F172A', fontStyle: 'italic', marginBottom: 4 },
-  vehicleName: { fontSize: 14, fontWeight: 'bold', color: '#64748B' },
-  deleteButton: { padding: 8 }
+  scroll: { paddingHorizontal: 20, paddingTop: 28, paddingBottom: 48 },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  cardTitle: { fontSize: 18, color: colors.foreground, marginBottom: 16 },
+  row: { flexDirection: 'row', gap: 12 },
+  vehicle: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16 },
+  divider: { borderTopWidth: 1, borderTopColor: colors.border },
+  delete: { width: 38, height: 38, borderRadius: radius.md, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' },
 });

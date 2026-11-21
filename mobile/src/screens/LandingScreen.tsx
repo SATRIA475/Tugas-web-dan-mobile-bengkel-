@@ -1,239 +1,277 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Dimensions, Platform } from 'react-native';
-import { Menu, X, CheckCircle2, ChevronRight, MapPin, Phone } from 'lucide-react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions, LayoutAnimation } from 'react-native';
+import { Menu, X, ChevronRight, ChevronDown, Clock, ShieldCheck, CheckCircle2, Star, MapPin, Phone } from 'lucide-react-native';
+import { Screen, AppHeader, Marquee, Card, SectionTitle, Button, IconButton, Brand, IconTile, Badge } from '../components/ui';
+import { colors, type, radius } from '../theme';
 
 const { width } = Dimensions.get('window');
+const GUTTER = 20;
+
+const layanan = [
+  { id: '1', nama: 'Servis Rutin Ringan', desc: 'Ganti oli, cek kampas rem, busi, dan tegangan aki dengan presisi.', harga: 150000, menit: 60, popular: true },
+  { id: '2', nama: 'Servis Besar / Berat', desc: 'Bongkar mesin (turun mesin), ganti piston, dan restorasi performa.', harga: 750000, menit: 360, popular: false },
+  { id: '3', nama: 'Ganti Oli Mesin', desc: 'Ganti oli mesin standar pabrik dengan jaminan pelumas orisinil.', harga: 65000, menit: 30, popular: false },
+];
+
+const features = [
+  { Icon: Clock, title: 'Tanpa antre', desc: 'Datang sesuai jadwal dan langsung ditangani di pit khusus.' },
+  { Icon: ShieldCheck, title: 'Mekanik bersertifikat', desc: 'Ditangani teknisi berpengalaman dengan standar balap.' },
+  { Icon: CheckCircle2, title: 'Biaya transparan', desc: 'Rincian biaya jelas di awal, tanpa biaya tersembunyi.' },
+];
+
+export const faqs = [
+  { q: 'Bagaimana cara booking servis?', a: 'Buka menu Booking, pilih kendaraan, layanan, dan jadwal yang Anda inginkan. Anda perlu login atau daftar member terlebih dahulu.' },
+  { q: 'Apakah harus daftar member untuk servis?', a: 'Untuk booking online, ya. Dengan akun member Anda bisa menyimpan data kendaraan dan melihat riwayat servis kapan saja.' },
+  { q: 'Berapa lama waktu pengerjaan servis?', a: 'Tergantung layanan. Servis rutin sekitar 60 menit, ganti oli sekitar 30 menit, dan servis besar bisa sampai 6 jam.' },
+  { q: 'Apakah suku cadangnya orisinil?', a: 'Ya. Kami hanya memakai suku cadang orisinil dan merek performa dari partner resmi seperti BRT, UMA Racing, TDR, KYB, dan lainnya.' },
+  { q: 'Metode pembayaran apa saja yang diterima?', a: 'Pembayaran dilakukan di kasir bengkel setelah servis selesai. Rincian biaya selalu transparan sebelum pengerjaan.' },
+  { q: 'Siapa yang mengembangkan aplikasi Satra Garage+?', a: 'Aplikasi ini dikembangkan oleh Riansa Putra (Backend dan SRS) dan Satria Arief Wibowo (Fullstack Developer).' },
+];
+
+const partners = [
+  { name: 'BRT', img: require('../../assets/brands/brt1.png') },
+  { name: 'UMA RACING', img: require('../../assets/brands/uma-racing.png') },
+  { name: 'TDR', img: require('../../assets/brands/tdr.png') },
+  { name: 'FIM PISTON', img: require('../../assets/brands/fim.png') },
+  { name: 'KAWAHARA', img: require('../../assets/brands/kawahara.png') },
+  { name: 'KYB', img: require('../../assets/brands/kyb.png') },
+  { name: 'DAYTONA', img: require('../../assets/brands/daytona.png') },
+  { name: 'YSS', img: require('../../assets/brands/yss.png') },
+];
+
+export function FaqList() {
+  const [open, setOpen] = useState<number | null>(null);
+  return (
+    <Card style={{ paddingHorizontal: 4 }}>
+      {faqs.map((f, i) => {
+        const isOpen = open === i;
+        return (
+          <View key={f.q} style={i > 0 && styles.faqDivider}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => {
+                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                setOpen(isOpen ? null : i);
+              }}
+              style={styles.faqHead}
+            >
+              <Text style={[type.label, { flex: 1, fontSize: 15, fontWeight: '700', color: colors.foreground }]}>{f.q}</Text>
+              <View style={{ transform: [{ rotate: isOpen ? '180deg' : '0deg' }] }}>
+                <ChevronDown color={isOpen ? colors.primary : colors.mutedForeground} size={20} />
+              </View>
+            </TouchableOpacity>
+            {isOpen && <Text style={[type.body, styles.faqBody]}>{f.a}</Text>}
+          </View>
+        );
+      })}
+    </Card>
+  );
+}
 
 export default function LandingScreen({ navigation }: any) {
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const services = [
-    { title: 'TUNE UP KOMPETISI', desc: 'Kalibrasi presisi untuk efisiensi dan tenaga maksimal.', price: 'Rp 500.000' },
-    { title: 'ENGINE BUILD', desc: 'Perakitan mesin balap dari nol dengan standar sirkuit.', price: 'Rp 2.500.000' },
-    { title: 'ECU REMAPPING', desc: 'Buka limit performa bawaan pabrik untuk tenaga instan.', price: 'Rp 750.000' },
-  ];
-
-  const partners = [
-    { name: 'BRT', img: require('../../assets/brands/brt1.png') },
-    { name: 'UMA RACING', img: require('../../assets/brands/uma-racing.png') },
-    { name: 'TDR', img: require('../../assets/brands/tdr.png') },
-    { name: 'FIM PISTON', img: require('../../assets/brands/fim.png') },
-    { name: 'KAWAHARA', img: require('../../assets/brands/kawahara.png') },
-    { name: 'KYB', img: require('../../assets/brands/kyb.png') },
-    { name: 'DAYTONA', img: require('../../assets/brands/daytona.png') },
-    { name: 'YSS', img: require('../../assets/brands/yss.png') }
-  ];
+  const go = (r: string) => {
+    setMenuOpen(false);
+    navigation.navigate(r);
+  };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      {/* Header / Navbar */}
-      <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <Text style={styles.brandText}>SATRA <Text style={styles.brandTextPrimary}>GARAGE+</Text></Text>
-        </View>
-        <TouchableOpacity onPress={() => setMenuOpen(!menuOpen)} style={styles.menuBtn}>
-          {menuOpen ? <X color="#FFF" size={24} /> : <Menu color="#FFF" size={24} />}
-        </TouchableOpacity>
-      </View>
+    <Screen>
+      <AppHeader
+        right={
+          <IconButton onPress={() => setMenuOpen(!menuOpen)}>
+            {menuOpen ? <X color={colors.foreground} size={20} /> : <Menu color={colors.foreground} size={20} />}
+          </IconButton>
+        }
+      />
 
-      {/* Mobile Menu Dropdown */}
       {menuOpen && (
-        <View style={styles.mobileMenu}>
-          <TouchableOpacity style={styles.menuItem} onPress={() => setMenuOpen(false)}>
-            <Text style={styles.menuItemText}>BERANDA</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuOpen(false); navigation.navigate('Login'); }}>
-            <Text style={styles.menuItemText}>LAYANAN</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.menuItem, styles.menuItemPrimary]} onPress={() => { setMenuOpen(false); navigation.navigate('Login'); }}>
-            <Text style={[styles.menuItemText, { color: '#FFF' }]}>MEMBER LOGIN</Text>
-          </TouchableOpacity>
+        <View style={styles.menu}>
+          {[
+            { label: 'Beranda', on: () => setMenuOpen(false) },
+            { label: 'Layanan', on: () => go('Login') },
+            { label: 'Daftar member', on: () => go('Register') },
+          ].map((m) => (
+            <TouchableOpacity key={m.label} style={styles.menuItem} onPress={m.on}>
+              <Text style={[type.label, { fontSize: 15, color: colors.foreground }]}>{m.label}</Text>
+              <ChevronRight color={colors.mutedForeground} size={18} />
+            </TouchableOpacity>
+          ))}
+          <Button title="Masuk" onPress={() => go('Login')} style={{ margin: 16 }} />
         </View>
       )}
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
-        
-        {/* HERO SECTION */}
-        <View style={styles.heroSection}>
-          {/* We use a dark background simulating the image since we don't have the exact hero bg image locally */}
-          <View style={styles.heroOverlay}>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>BENGKEL RACING #1 DI SENTUL</Text>
-            </View>
-            <Text style={styles.heroTitle}>BENGKELNYA PARA <Text style={styles.textPrimary}>JUARA</Text></Text>
-            <Text style={styles.heroDesc}>Tingkatkan performa motormu ke level maksimal. Ditangani mekanik spesialis balap dengan standar sirkuit internasional.</Text>
-            
-            <View style={styles.heroButtons}>
-              <TouchableOpacity style={styles.btnPrimary} onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.btnPrimaryText}>BOOKING SEKARANG</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.btnSecondary} onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.btnSecondaryText}>LIHAT LAYANAN</Text>
-              </TouchableOpacity>
-            </View>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 8 }}>
+        <Marquee />
+
+        {/* HERO */}
+        <View style={styles.block}>
+          <Image source={require('../../assets/banner.png')} style={styles.hero} resizeMode="cover" />
+          <Text style={[type.display, styles.heroTitle]}>
+            Servis motor tanpa antre, <Text style={{ color: colors.primary }}>hasil maksimal.</Text>
+          </Text>
+          <Text style={[type.body, styles.heroDesc]}>Booking jadwal dari HP, datang tepat waktu, dan motor langsung ditangani mekanik berpengalaman.</Text>
+          <View style={{ flexDirection: 'row', gap: 12, marginTop: 20 }}>
+            <Button title="Booking" onPress={() => navigation.navigate('Login')} icon={<ChevronRight color="#FFF" size={18} />} style={{ flex: 1 }} />
+            <Button title="Daftar" variant="outline" onPress={() => navigation.navigate('Register')} style={{ flex: 1 }} />
           </View>
         </View>
 
-        {/* STATS SECTION */}
-        <View style={styles.statsSection}>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>5000+</Text>
-            <Text style={styles.statLabel}>PERBAIKAN SUKSES</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>25</Text>
-            <Text style={styles.statLabel}>MEKANIK CERTIFIED</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>99%</Text>
-            <Text style={styles.statLabel}>KEPUASAN PELANGGAN</Text>
-          </View>
-        </View>
-
-        {/* FEATURES SECTION */}
-        <View style={styles.featuresSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>LAYANAN <Text style={styles.textPrimary}>SIGNATURE</Text></Text>
-            <Text style={styles.sectionSubtitle}>Dikerjakan dengan presisi menggunakan alat diagnostik terbaru.</Text>
-          </View>
-
-          {services.map((srv, idx) => (
-            <View key={idx} style={styles.serviceCard}>
-              <View style={styles.serviceIconWrap}>
-                <CheckCircle2 color="#DC2626" size={24} />
+        {/* STATS */}
+        <View style={styles.block}>
+          <Card style={styles.stats}>
+            {[
+              { n: '500+', l: 'Motor diservis' },
+              { n: '99%', l: 'Pelanggan puas' },
+              { n: '15+', l: 'Mekanik' },
+            ].map((st, i) => (
+              <View key={st.l} style={[styles.stat, i > 0 && { borderLeftWidth: 1, borderLeftColor: colors.border }]}>
+                <Text style={[type.display, { fontSize: 22, color: colors.foreground }]}>{st.n}</Text>
+                <Text style={[type.body, { fontSize: 12, color: colors.mutedForeground, marginTop: 2 }]}>{st.l}</Text>
               </View>
-              <Text style={styles.serviceTitle}>{srv.title}</Text>
-              <Text style={styles.serviceDesc}>{srv.desc}</Text>
-              <View style={styles.serviceFooter}>
-                <Text style={styles.servicePrice}>Mulai {srv.price}</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                  <ChevronRight color="#DC2626" size={24} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
+            ))}
+          </Card>
         </View>
 
-        {/* PARTNERS SECTION */}
-        <View style={styles.partnersSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>OFFICIAL <Text style={styles.textPrimary}>PARTNERS</Text></Text>
-            <Text style={styles.sectionSubtitle}>Suku cadang performa tinggi berstandar kompetisi.</Text>
-          </View>
+        {/* FEATURES */}
+        <View style={styles.block}>
+          <SectionTitle title="Kenapa" highlight="Satra Garage+" subtitle="Standar bengkel balap untuk motor harian Anda." />
+          <Card>
+            {features.map(({ Icon, title, desc }, i) => (
+              <View key={title} style={[styles.featureRow, i > 0 && styles.faqDivider]}>
+                <IconTile>
+                  <Icon color={colors.primary} size={22} />
+                </IconTile>
+                <View style={{ flex: 1 }}>
+                  <Text style={[type.label, { fontSize: 15, fontWeight: '700', color: colors.foreground }]}>{title}</Text>
+                  <Text style={[type.body, { fontSize: 13.5, color: colors.mutedForeground, marginTop: 2, lineHeight: 19 }]}>{desc}</Text>
+                </View>
+              </View>
+            ))}
+          </Card>
+        </View>
 
+        {/* LAYANAN */}
+        <View style={styles.block}>
+          <SectionTitle title="Layanan" highlight="populer" subtitle="Harga mulai dan estimasi waktu pengerjaan." />
+          <View style={{ gap: 12 }}>
+            {layanan.map((item) => (
+              <Card key={item.id} highlight={item.popular} style={{ padding: 18 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                  <Text style={[type.display, { flex: 1, fontSize: 17, color: colors.foreground }]}>{item.nama}</Text>
+                  {item.popular && (
+                    <View style={styles.popular}>
+                      <Star color={colors.primary} fill={colors.primary} size={11} />
+                      <Text style={[type.label, { color: colors.primary, fontSize: 11.5 }]}>Rekomendasi</Text>
+                    </View>
+                  )}
+                </View>
+                <Text style={[type.body, { color: colors.foreground70, marginTop: 6, lineHeight: 20 }]}>{item.desc}</Text>
+                <View style={styles.serviceFoot}>
+                  <View>
+                    <Text style={[type.display, { fontSize: 20, color: colors.foreground }]}>Rp {item.harga.toLocaleString('id-ID')}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                      <Clock color={colors.mutedForeground} size={13} />
+                      <Text style={[type.body, { fontSize: 12.5, color: colors.mutedForeground }]}>± {item.menit} menit</Text>
+                    </View>
+                  </View>
+                  <Button title="Pilih" size="sm" variant={item.popular ? 'primary' : 'outline'} onPress={() => navigation.navigate('Login')} />
+                </View>
+              </Card>
+            ))}
+          </View>
+        </View>
+
+        {/* FAQ */}
+        <View style={styles.block}>
+          <SectionTitle title="Pertanyaan" highlight="umum" subtitle="Yang sering ditanyakan tentang Satra Garage+." />
+          <FaqList />
+        </View>
+
+        {/* PARTNERS */}
+        <View style={styles.block}>
+          <SectionTitle title="Partner" highlight="resmi" subtitle="Suku cadang performa tinggi berstandar kompetisi." />
           <View style={styles.partnersGrid}>
-            {partners.map((partner, index) => (
-              <View key={index} style={styles.partnerLogoBox}>
-                <Image source={partner.img} style={styles.partnerImg} resizeMode="contain" />
+            {partners.map((p) => (
+              <View key={p.name} style={styles.partnerBox}>
+                <Image source={p.img} style={{ width: '78%', height: '62%' }} resizeMode="contain" />
               </View>
             ))}
           </View>
         </View>
 
-        {/* CTA SECTION */}
-        <View style={styles.ctaSection}>
-          <Text style={styles.ctaTitle}>BERGABUNG DENGAN KAUM <Text style={styles.textPrimary}>ELITE</Text></Text>
-          <Text style={styles.ctaDesc}>Dapatkan diskon khusus member, prioritas antrian, dan histori servis digital selamanya.</Text>
-          <TouchableOpacity style={styles.btnPrimary} onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.btnPrimaryText}>DAFTAR SEKARANG</Text>
-          </TouchableOpacity>
+        {/* CTA */}
+        <View style={styles.block}>
+          <View style={styles.cta}>
+            <Badge text="Member" tone="primary" style={{ backgroundColor: '#FFF' }} />
+            <Text style={[type.display, { fontSize: 22, lineHeight: 28, color: '#FFF', marginTop: 10 }]}>Simpan data motor & riwayat servis Anda.</Text>
+            <Text style={[type.body, { color: 'rgba(255,255,255,0.88)', marginTop: 6, lineHeight: 20 }]}>Daftar gratis, booking lebih cepat setiap kali datang.</Text>
+            <TouchableOpacity activeOpacity={0.85} onPress={() => navigation.navigate('Register')} style={styles.ctaBtn}>
+              <Text style={[type.label, { color: colors.primary, fontSize: 15, fontWeight: '700' }]}>Daftar sekarang</Text>
+              <ChevronRight color={colors.primary} size={18} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* FOOTER */}
         <View style={styles.footer}>
-          <View style={styles.footerCol}>
-            <Text style={styles.brandText}>SATRA <Text style={styles.brandTextPrimary}>GARAGE+</Text></Text>
-            <Text style={styles.footerDesc}>Pusat perawatan otomotif premium dengan standar balap untuk kaum elite pecinta kecepatan.</Text>
+          <Brand size={16} />
+          <Text style={[type.body, styles.footerText]}>Pusat perawatan motor dengan standar balap.</Text>
+          <View style={styles.contact}>
+            <MapPin color={colors.mutedForeground} size={16} />
+            <Text style={[type.body, styles.footerText, { flex: 1, marginTop: 0 }]}>Jl. Balap No. 99, Sirkuit Sentul, Bogor, Jawa Barat 16810</Text>
           </View>
-          
-          <View style={styles.footerCol}>
-            <Text style={styles.footerTitle}>HUBUNGI <Text style={styles.textPrimary}>KAMI</Text></Text>
-            <View style={styles.footerContact}>
-              <MapPin color="#DC2626" size={16} />
-              <Text style={styles.footerContactText}>Jl. Balap No. 99, Sentul</Text>
-            </View>
-            <View style={styles.footerContact}>
-              <Phone color="#DC2626" size={16} />
-              <Text style={styles.footerContactText}>+62 812 3456 7890</Text>
-            </View>
+          <View style={styles.contact}>
+            <Phone color={colors.mutedForeground} size={16} />
+            <Text style={[type.body, styles.footerText, { marginTop: 0 }]}>+62 812 3456 7890</Text>
           </View>
-
-          <View style={styles.footerBottom}>
-            <Text style={styles.copyright}>© 2026 SATRA GARAGE+. PERFORMANCE UNLEASHED.</Text>
-          </View>
+          <Text style={[type.body, { color: '#A1A1AA', fontSize: 12, marginTop: 20 }]}>© 2026 Satra Garage+</Text>
         </View>
-
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#0F172A', paddingTop: Platform.OS === 'android' ? 30 : 0 },
-  textPrimary: { color: '#DC2626' },
-  
-  // Header
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, backgroundColor: '#1E293B', borderBottomWidth: 4, borderBottomColor: '#DC2626' },
-  logoContainer: { flexDirection: 'row', alignItems: 'center' },
-  brandText: { fontSize: 22, fontWeight: '900', fontStyle: 'italic', color: '#FFF' },
-  brandTextPrimary: { color: '#DC2626' },
-  menuBtn: { padding: 8, backgroundColor: '#DC2626' },
-  
-  // Mobile Menu
-  mobileMenu: { position: 'absolute', top: 76, left: 0, right: 0, backgroundColor: '#1E293B', zIndex: 10, borderBottomWidth: 4, borderBottomColor: '#DC2626' },
-  menuItem: { padding: 20, borderBottomWidth: 1, borderBottomColor: '#334155' },
-  menuItemPrimary: { backgroundColor: '#DC2626' },
-  menuItemText: { color: '#FFF', fontSize: 16, fontWeight: '900', fontStyle: 'italic', textAlign: 'center' },
+  menu: {
+    position: 'absolute',
+    top: 65,
+    left: 12,
+    right: 12,
+    zIndex: 20,
+    elevation: 20,
+    backgroundColor: colors.card,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: 'hidden',
+  },
+  menuItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 15, paddingHorizontal: 18, borderBottomWidth: 1, borderBottomColor: colors.border },
 
-  // Hero Section
-  heroSection: { backgroundColor: '#0F172A' },
-  heroOverlay: { padding: 30, paddingVertical: 60, alignItems: 'center' },
-  badge: { backgroundColor: 'rgba(220,38,38,0.2)', paddingHorizontal: 16, paddingVertical: 8, borderWidth: 1, borderColor: '#DC2626', marginBottom: 20 },
-  badgeText: { color: '#DC2626', fontSize: 12, fontWeight: 'bold' },
-  heroTitle: { fontSize: 42, fontWeight: '900', fontStyle: 'italic', color: '#FFF', textAlign: 'center', marginBottom: 16 },
-  heroDesc: { fontSize: 16, color: '#94A3B8', textAlign: 'center', marginBottom: 30, lineHeight: 24, fontWeight: 'bold' },
-  heroButtons: { width: '100%', gap: 16 },
-  btnPrimary: { backgroundColor: '#DC2626', padding: 18, alignItems: 'center', borderWidth: 2, borderColor: '#FFF' },
-  btnPrimaryText: { color: '#FFF', fontSize: 16, fontWeight: '900', fontStyle: 'italic' },
-  btnSecondary: { backgroundColor: 'transparent', padding: 18, alignItems: 'center', borderWidth: 2, borderColor: '#DC2626' },
-  btnSecondaryText: { color: '#DC2626', fontSize: 16, fontWeight: '900', fontStyle: 'italic' },
+  block: { paddingHorizontal: GUTTER, paddingTop: 28 },
+  hero: { width: width - GUTTER * 2, height: (width - GUTTER * 2) / 2, borderRadius: radius.xl },
+  heroTitle: { fontSize: 28, lineHeight: 34, color: colors.foreground, marginTop: 22 },
+  heroDesc: { fontSize: 15, lineHeight: 22, color: colors.mutedForeground, marginTop: 10 },
 
-  // Stats Section
-  statsSection: { flexDirection: 'row', flexWrap: 'wrap', backgroundColor: '#DC2626' },
-  statBox: { width: '100%', padding: 30, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: 'rgba(0,0,0,0.1)' },
-  statNumber: { fontSize: 48, fontWeight: '900', fontStyle: 'italic', color: '#000' },
-  statLabel: { fontSize: 14, fontWeight: '900', color: '#FFF' },
+  stats: { flexDirection: 'row', paddingVertical: 16 },
+  stat: { flex: 1, alignItems: 'center' },
 
-  // Features Section
-  featuresSection: { padding: 30, backgroundColor: '#0F172A' },
-  sectionHeader: { alignItems: 'center', marginBottom: 40 },
-  sectionTitle: { fontSize: 32, fontWeight: '900', fontStyle: 'italic', color: '#FFF', textAlign: 'center' },
-  sectionSubtitle: { fontSize: 14, color: '#94A3B8', textAlign: 'center', marginTop: 10, fontWeight: 'bold' },
-  serviceCard: { backgroundColor: '#1E293B', padding: 24, marginBottom: 20, borderWidth: 2, borderColor: '#334155', borderLeftWidth: 6, borderLeftColor: '#DC2626' },
-  serviceIconWrap: { backgroundColor: 'rgba(220,38,38,0.1)', width: 48, height: 48, justifyContent: 'center', alignItems: 'center', marginBottom: 16, borderRadius: 24 },
-  serviceTitle: { fontSize: 20, fontWeight: '900', fontStyle: 'italic', color: '#FFF', marginBottom: 8 },
-  serviceDesc: { fontSize: 14, color: '#94A3B8', marginBottom: 16, lineHeight: 22 },
-  serviceFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: '#334155', paddingTop: 16 },
-  servicePrice: { fontSize: 18, fontWeight: '900', color: '#FFF' },
+  featureRow: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16 },
 
-  // Partners Section
-  partnersSection: { padding: 30, backgroundColor: '#F1F5F9' },
-  partnersGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, justifyContent: 'center' },
-  partnerLogoBox: { width: width / 2 - 40, height: 80, backgroundColor: 'rgba(15, 23, 42, 0.05)', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#CBD5E1' },
-  partnerImg: { width: '80%', height: '60%', opacity: 0.6 },
+  popular: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.primarySoft, paddingHorizontal: 9, paddingVertical: 4, borderRadius: radius.pill },
+  serviceFoot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 14, paddingTop: 14, borderTopWidth: 1, borderTopColor: colors.border },
 
-  // CTA Section
-  ctaSection: { padding: 40, backgroundColor: '#0F172A', alignItems: 'center', borderTopWidth: 4, borderTopColor: '#DC2626' },
-  ctaTitle: { fontSize: 28, fontWeight: '900', fontStyle: 'italic', color: '#FFF', textAlign: 'center', marginBottom: 16 },
-  ctaDesc: { fontSize: 14, color: '#94A3B8', textAlign: 'center', marginBottom: 30, fontWeight: 'bold' },
+  faqDivider: { borderTopWidth: 1, borderTopColor: colors.border },
+  faqHead: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 16, paddingHorizontal: 14 },
+  faqBody: { color: colors.foreground70, paddingHorizontal: 14, paddingBottom: 16, marginTop: -4, lineHeight: 21, fontSize: 14 },
 
-  // Footer
-  footer: { backgroundColor: '#000', padding: 30 },
-  footerCol: { marginBottom: 30 },
-  footerDesc: { color: '#94A3B8', fontSize: 12, marginTop: 10, lineHeight: 20 },
-  footerTitle: { fontSize: 16, fontWeight: '900', fontStyle: 'italic', color: '#FFF', marginBottom: 16, borderBottomWidth: 2, borderBottomColor: '#DC2626', alignSelf: 'flex-start', paddingBottom: 4 },
-  footerContact: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, gap: 10 },
-  footerContactText: { color: '#94A3B8', fontSize: 12, fontWeight: 'bold' },
-  footerBottom: { borderTopWidth: 1, borderTopColor: '#334155', paddingTop: 20, alignItems: 'center' },
-  copyright: { color: '#64748B', fontSize: 10, fontWeight: 'bold' }
+  partnersGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 10 },
+  partnerBox: { width: (width - GUTTER * 2 - 10) / 2, height: 72, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.card, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border },
+
+  cta: { backgroundColor: colors.primary, borderRadius: radius.xl, padding: 22 },
+  ctaBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: '#FFF', borderRadius: radius.md, height: 48, marginTop: 18 },
+
+  footer: { marginTop: 36, paddingHorizontal: GUTTER, paddingTop: 24, paddingBottom: 28, borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.card },
+  footerText: { color: colors.mutedForeground, fontSize: 13, lineHeight: 19, marginTop: 6 },
+  contact: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginTop: 12 },
 });

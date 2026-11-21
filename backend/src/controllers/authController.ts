@@ -7,6 +7,9 @@ import crypto from 'crypto';
 import { RowDataPacket } from 'mysql2';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-jwt-key-replace-me-in-production';
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+  console.warn('[auth] JWT_SECRET belum diatur — set environment variable JWT_SECRET di server.');
+}
 
 const registerSchema = z.object({
   email: z.string().email(),
